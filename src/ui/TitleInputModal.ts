@@ -31,7 +31,7 @@ export class TitleInputModal extends Modal {
 			text: 'One title per line. Add the year in parentheses to pick the right one.',
 		});
 		const textarea = contentEl.createEl('textarea', {
-			cls: 'media-notes-titles',
+			cls: 'media-note-creator-titles',
 			attr: { rows: '6', placeholder: 'Inception (2010)' },
 		});
 		textarea.value = this.initialTitles.join('\n');

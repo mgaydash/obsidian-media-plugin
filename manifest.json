@@ -1,7 +1,7 @@
 {
-	"id": "media-notes",
-	"name": "Media Notes",
-	"version": "0.1.0",
+	"id": "media-note-creator",
+	"name": "Media Note Creator",
+	"version": "0.2.0",
 	"minAppVersion": "1.11.4",
 	"description": "Create notes for movies, TV shows, games, albums, books and word lookups, with cover art.",
 	"author": "Mitchell Gaydash",

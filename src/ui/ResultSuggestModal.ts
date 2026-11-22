@@ -32,10 +32,10 @@ export class ResultSuggestModal extends SuggestModal<SearchResult> {
 	}
 
 	renderSuggestion(result: SearchResult, el: HTMLElement): void {
-		el.addClass('media-notes-suggestion');
+		el.addClass('media-note-creator-suggestion');
 		if (result.thumbnailUrl) {
 			const img = el.createEl('img', {
-				cls: 'media-notes-thumb',
+				cls: 'media-note-creator-thumb',
 				attr: { src: result.thumbnailUrl, alt: '' },
 			});
 			// Not every album has cover art; drop the broken image.
@@ -50,7 +50,7 @@ export class ResultSuggestModal extends SuggestModal<SearchResult> {
 				result.overview.length > 100
 					? `${result.overview.slice(0, 100)}…`
 					: result.overview;
-			text.createEl('small', { text: overview, cls: 'media-notes-overview' });
+			text.createEl('small', { text: overview, cls: 'media-note-creator-overview' });
 		}
 	}
 

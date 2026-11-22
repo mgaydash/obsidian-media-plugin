@@ -28,7 +28,7 @@ function setup(...responses: unknown[]) {
 	const sleep = vi.fn((_ms: number) => Promise.resolve());
 	let clock = 10_000;
 	const now = () => clock;
-	const client = new MusicBrainzClient(request, 'MediaNotes/test ( https://example.com )', sleep, now);
+	const client = new MusicBrainzClient(request, 'MediaNoteCreator/test ( https://example.com )', sleep, now);
 	return { client, request, sleep, tick: (ms: number) => (clock += ms) };
 }
 
@@ -45,7 +45,7 @@ describe('MusicBrainzClient.search', () => {
 		);
 		expect(url.searchParams.get('fmt')).toBe('json');
 		expect(url.searchParams.get('limit')).toBe('25');
-		expect(call?.headers?.['User-Agent']).toBe('MediaNotes/test ( https://example.com )');
+		expect(call?.headers?.['User-Agent']).toBe('MediaNoteCreator/test ( https://example.com )');
 
 		expect(results).toEqual([
 			{

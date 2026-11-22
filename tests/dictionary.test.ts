@@ -31,7 +31,7 @@ function setup(...responses: unknown[]) {
 		if (r instanceof Error) request.mockRejectedValueOnce(r);
 		else request.mockResolvedValueOnce(r);
 	}
-	return { client: new DictionaryClient(request, 'MediaNotes/test'), request };
+	return { client: new DictionaryClient(request, 'MediaNoteCreator/test'), request };
 }
 
 describe('DictionaryClient lookups', () => {
@@ -40,7 +40,7 @@ describe('DictionaryClient lookups', () => {
 		const results = await client.search('  serendipity ');
 		expect(request.mock.calls[0]?.[0]).toEqual({
 			url: 'https://api.dictionaryapi.dev/api/v2/entries/en/serendipity',
-			headers: { 'User-Agent': 'MediaNotes/test', Accept: 'application/json' },
+			headers: { 'User-Agent': 'MediaNoteCreator/test', Accept: 'application/json' },
 			timeoutMs: PRIMARY_TIMEOUT_MS,
 		});
 		expect(results).toEqual([

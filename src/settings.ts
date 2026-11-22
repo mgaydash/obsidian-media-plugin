@@ -7,9 +7,9 @@ import {
 	TFolder,
 } from 'obsidian';
 import { LINK_TEXT_STYLES, LinkTextStyle } from './core/selection';
-import type MediaNotesPlugin from './main';
+import type MediaNoteCreatorPlugin from './main';
 
-export interface MediaNotesSettings {
+export interface MediaNoteCreatorSettings {
 	/**
 	 * Name of the Keychain entry holding the TMDB API key. The key itself is
 	 * kept in Obsidian's Keychain, never in this plugin's data.json.
@@ -28,7 +28,7 @@ export interface MediaNotesSettings {
 	linkText: LinkTextStyle;
 }
 
-export const DEFAULT_SETTINGS: MediaNotesSettings = {
+export const DEFAULT_SETTINGS: MediaNoteCreatorSettings = {
 	tmdbSecretId: '',
 	igdbClientIdSecretId: '',
 	igdbClientSecretSecretId: '',
@@ -70,10 +70,10 @@ type SecretSettingKey =
 	| 'igdbClientSecretSecretId'
 	| 'googleBooksSecretId';
 
-export class MediaNotesSettingTab extends PluginSettingTab {
+export class MediaNoteCreatorSettingTab extends PluginSettingTab {
 	constructor(
 		app: App,
-		private readonly plugin: MediaNotesPlugin,
+		private readonly plugin: MediaNoteCreatorPlugin,
 	) {
 		super(app, plugin);
 	}
