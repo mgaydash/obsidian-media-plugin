@@ -13,8 +13,9 @@ notes from online APIs. It is a TypeScript port of the Python CLI in
 
 Status: feature-complete (movies and TV via TMDB; games via IGDB, albums via
 MusicBrainz, books via Google Books; word lookups via the Free Dictionary API
-with a Wiktionary fallback). Next: the 0.2.0 release under the new name,
-then community store submission.
+with a Wiktionary fallback), plus a command that creates collection pages
+and their Bases files. 0.3.0 is the first release under the new name (0.2.0
+was never tagged). Next: community store submission.
 
 ## Decisions (do not revisit without asking)
 
