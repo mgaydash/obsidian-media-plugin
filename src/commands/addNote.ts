@@ -1,5 +1,5 @@
 import { MarkdownFileInfo, Notice, TFile } from 'obsidian';
-import { TmdbClient } from '../api/tmdb';
+import { createClient } from './clients';
 import { addTitle } from '../core/addTitle';
 import type { MediaType } from '../core/notes';
 import {
@@ -10,7 +10,7 @@ import {
 } from '../core/selection';
 import { normalizeTitles } from '../core/titles';
 import type MediaNotesPlugin from '../main';
-import { getBytes, getJson } from '../obsidian/http';
+import { getBytes } from '../obsidian/http';
 import { resizeToJpeg } from '../obsidian/poster';
 import {
 	fileExists,
@@ -22,22 +22,23 @@ import { ConfirmModal } from '../ui/ConfirmModal';
 import { ResultSuggestModal } from '../ui/ResultSuggestModal';
 import { TitleInputModal } from '../ui/TitleInputModal';
 
-const LABELS: Record<MediaType, string> = {
-	movie: 'Add movie notes',
-	tv: 'Add TV notes',
+/** Command id, command name and prompt heading for each media type. */
+const COMMANDS: Record<MediaType, { id: string; name: string; heading: string }> = {
+	movie: { id: 'add-movie-note', name: 'Add movie note', heading: 'Add movie notes' },
+	tv: { id: 'add-tv-note', name: 'Add TV note', heading: 'Add TV notes' },
+	game: { id: 'add-game-note', name: 'Add game note', heading: 'Add game notes' },
+	album: { id: 'add-album-note', name: 'Add album note', heading: 'Add album notes' },
+	book: { id: 'add-book-note', name: 'Add book note', heading: 'Add book notes' },
 };
 
 export function registerAddCommands(plugin: MediaNotesPlugin): void {
-	plugin.addCommand({
-		id: 'add-movie-note',
-		name: 'Add movie note',
-		callback: () => void runAdd(plugin, 'movie'),
-	});
-	plugin.addCommand({
-		id: 'add-tv-note',
-		name: 'Add TV note',
-		callback: () => void runAdd(plugin, 'tv'),
-	});
+	for (const [mediaType, command] of Object.entries(COMMANDS) as [MediaType, (typeof COMMANDS)[MediaType]][]) {
+		plugin.addCommand({
+			id: command.id,
+			name: command.name,
+			callback: () => void runAdd(plugin, mediaType),
+		});
+	}
 }
 
 async function runAdd(
@@ -45,9 +46,9 @@ async function runAdd(
 	mediaType: MediaType,
 ): Promise<void> {
 	const { app } = plugin;
-	const apiKey = plugin.getSecret(plugin.settings.tmdbSecretId);
-	if (!apiKey) {
-		new Notice('Add your TMDB API key in the Media Notes settings first.');
+	const client = createClient(plugin, mediaType);
+	if (typeof client === 'string') {
+		new Notice(client);
 		return;
 	}
 
@@ -59,7 +60,7 @@ async function runAdd(
 		view?.editor && sourceFile ? captureSelection(view.editor) : [];
 	const titles = await new TitleInputModal(
 		app,
-		LABELS[mediaType],
+		COMMANDS[mediaType].heading,
 		normalizeTitles(segments.map((s) => s.parsed.title)),
 	).openAndWait();
 	if (titles.length === 0) return;
@@ -72,7 +73,6 @@ async function runAdd(
 		return;
 	}
 
-	const client = new TmdbClient(apiKey, mediaType, getJson);
 	const width = plugin.settings.posterWidth;
 	const created = new Map<string, CreatedNote>();
 

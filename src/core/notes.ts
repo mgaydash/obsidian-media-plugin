@@ -3,12 +3,15 @@
  * `lib/obsidian_utils.py`.
  */
 
-export type MediaType = 'movie' | 'tv';
+export type MediaType = 'movie' | 'tv' | 'game' | 'album' | 'book';
 
 /** Media type -> the collection note a new note belongs to. */
 export const COLLECTION_BY_MEDIA_TYPE: Record<MediaType, string> = {
 	movie: 'Movies',
 	tv: 'Series',
+	game: 'Games',
+	album: 'Albums',
+	book: 'Books',
 };
 
 export function wikilink(text: string): string {

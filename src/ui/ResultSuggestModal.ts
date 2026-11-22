@@ -34,10 +34,12 @@ export class ResultSuggestModal extends SuggestModal<SearchResult> {
 	renderSuggestion(result: SearchResult, el: HTMLElement): void {
 		el.addClass('media-notes-suggestion');
 		if (result.thumbnailUrl) {
-			el.createEl('img', {
+			const img = el.createEl('img', {
 				cls: 'media-notes-thumb',
 				attr: { src: result.thumbnailUrl, alt: '' },
 			});
+			// Not every album has cover art; drop the broken image.
+			img.addEventListener('error', () => img.remove());
 		}
 		const text = el.createDiv();
 		text.createDiv({
