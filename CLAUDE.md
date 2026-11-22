@@ -11,10 +11,10 @@ this plugin. Keep it current when the structure or workflow changes.
 notes from online APIs. It is a TypeScript port of the Python CLI in
 `mgaydash/obsidian-tools`, and its notes must match what the CLI writes.
 
-Status: milestones 1 to 3 of 5 done (movies and TV via TMDB; games via
-IGDB, albums via MusicBrainz, books via Google Books; word lookups via the
-Free Dictionary API with a Wiktionary fallback). Next: a "download missing
-posters" command, then community store submission.
+Status: feature-complete (movies and TV via TMDB; games via IGDB, albums via
+MusicBrainz, books via Google Books; word lookups via the Free Dictionary API
+with a Wiktionary fallback). Next: the 0.1.0 release (BRAT first), then
+community store submission.
 
 ## Decisions (do not revisit without asking)
 
@@ -31,6 +31,8 @@ posters" command, then community store submission.
 - **Store-ready from day one**: follow the plugin guidelines and keep
   `npm run lint` free of errors.
 - The CLI's vault backup (`-b`) is intentionally not ported.
+- The CLI's `posters` command (backfill covers for existing notes) is
+  intentionally not ported. It served a one-time import and stays CLI-only.
 
 ## Layout
 
@@ -148,6 +150,21 @@ npm run lint     # eslint (obsidianmd rules)
 CI (`.github/workflows/lint.yml`) runs build, lint and tests on Node 20, 22 and
 24 for every push and PR. Tagging a version runs `release.yml`, which makes a
 draft GitHub release with `main.js`, `manifest.json` and `styles.css`.
+
+## Releasing
+
+1. `npm version patch` (or `minor`) on `main`. `version-bump.mjs` updates
+   `manifest.json` and `versions.json`. Keep `minAppVersion` accurate.
+2. Push the tag. It must equal the version exactly, with no leading `v`.
+3. Publish the draft release that `release.yml` creates. BRAT and the store
+   both read the latest published release.
+
+Store guidelines to keep: `vault.process()` (not `modify`) to rewrite a note,
+`getFileByPath()`, `normalizePath()` on user paths, no `console.log`, no
+inline styles, sentence-case UI text, network use and needed accounts
+disclosed in `README.md`. The one lint warning
+(`prefer-setting-definitions`) needs the Obsidian 1.13 settings API, above
+`minAppVersion`, and is accepted.
 
 ## Adding a media type
 

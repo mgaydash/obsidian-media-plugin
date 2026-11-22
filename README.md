@@ -58,6 +58,18 @@ For each title the plugin:
 
 If a note with that name already exists, you are asked before it is replaced.
 
+## Install
+
+Until Media Notes is in the community plugin list, install it with
+[BRAT](https://github.com/TfTHacker/obsidian42-brat):
+
+1. Install and enable **BRAT** from **Settings → Community plugins**.
+2. Run **BRAT: Add a beta plugin for testing** from the command palette.
+3. Enter `mgaydash/obsidian-media-plugin` and select **Add plugin**.
+4. Enable **Media Notes** under **Settings → Community plugins**.
+
+BRAT keeps the plugin up to date as new releases come out.
+
 ## Setup
 
 Get keys for the sources you want, then in Obsidian open
@@ -83,6 +95,10 @@ and mobile.
 The plugin contacts these services only when you run one of its commands,
 and only the one for the media type you chose. It sends the titles you enter
 and your key for that service. Nothing else from your vault leaves your device.
+The plugin collects no analytics.
+
+Movies, TV, games and books need a free account with that service to get a
+key (TMDB, Twitch and Google Cloud). Albums and word lookups need no account.
 
 | Media | Hosts |
 | --- | --- |

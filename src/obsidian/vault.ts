@@ -1,4 +1,4 @@
-import { App, normalizePath, TFile, TFolder } from 'obsidian';
+import { App, normalizePath, TFolder } from 'obsidian';
 
 /**
  * The folder new notes go in, as a vault path ('' for the root).
@@ -32,8 +32,9 @@ export async function writeNote(
 	path: string,
 	content: string,
 ): Promise<void> {
-	const existing = app.vault.getAbstractFileByPath(normalizePath(path));
-	if (existing instanceof TFile) await app.vault.modify(existing, content);
+	const existing = app.vault.getFileByPath(normalizePath(path));
+	// process() is the guideline way to replace a file's text in the background.
+	if (existing) await app.vault.process(existing, () => content);
 	else await app.vault.create(normalizePath(path), content);
 }
 
@@ -42,7 +43,7 @@ export async function writeBinary(
 	path: string,
 	data: ArrayBuffer,
 ): Promise<void> {
-	const existing = app.vault.getAbstractFileByPath(normalizePath(path));
-	if (existing instanceof TFile) await app.vault.modifyBinary(existing, data);
+	const existing = app.vault.getFileByPath(normalizePath(path));
+	if (existing) await app.vault.modifyBinary(existing, data);
 	else await app.vault.createBinary(normalizePath(path), data);
 }
