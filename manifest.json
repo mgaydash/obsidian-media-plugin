@@ -1,0 +1,10 @@
+{
+	"id": "media-notes",
+	"name": "Media Notes",
+	"version": "0.1.0",
+	"minAppVersion": "1.11.4",
+	"description": "Create notes for movies and TV shows from TMDB, with poster art.",
+	"author": "Mitchell Gaydash",
+	"authorUrl": "https://github.com/mgaydash",
+	"isDesktopOnly": false
+}
