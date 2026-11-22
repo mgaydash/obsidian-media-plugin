@@ -72,6 +72,11 @@ tests/                      # Vitest; fixtures copied from the CLI repo
   added, the CLI rewrites YAML with PyYAML (single quotes, unindented lists);
   the plugin keeps the double-quoted, indented style. The parsed values are
   identical.
+- **Selected text prefills the title prompt.** `commands/addNote.ts` reads
+  `workspace.activeEditor?.editor?.getSelection()`, and
+  `titlesFromSelection()` in `core/titles.ts` turns each line into a title,
+  dropping bullets, numbering, checkboxes, headings and wikilink brackets
+  (an alias keeps the link target). The user can still edit before adding.
 - **`SuggestModal` calls `onClose` before `onChooseSuggestion`**, so
   `ResultSuggestModal` resolves on the next tick. Keep that pattern in new
   pick lists.

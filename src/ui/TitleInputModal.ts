@@ -12,6 +12,7 @@ export class TitleInputModal extends Modal {
 	constructor(
 		app: App,
 		private readonly heading: string,
+		private readonly initialTitles: string[] = [],
 	) {
 		super(app);
 	}
@@ -33,6 +34,7 @@ export class TitleInputModal extends Modal {
 			cls: 'media-notes-titles',
 			attr: { rows: '6', placeholder: 'Inception (2010)' },
 		});
+		textarea.value = this.initialTitles.join('\n');
 
 		const submit = () => {
 			this.titles = splitTitles(textarea.value);
@@ -45,7 +47,9 @@ export class TitleInputModal extends Modal {
 			}
 		});
 
-		new Setting(contentEl).addButton((button) =>
+		new Setting(contentEl)
+			.setDesc('Press Ctrl+Enter (Cmd+Enter on Mac) to add.')
+			.addButton((button) =>
 			button.setButtonText('Add').setCta().onClick(submit),
 		);
 		window.setTimeout(() => textarea.focus(), 0);

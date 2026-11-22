@@ -7,7 +7,13 @@ import {
 } from '../src/core/disambiguation';
 import { translateGenreTag } from '../src/core/genres';
 import { buildFrontmatter, sanitizeFilename } from '../src/core/notes';
-import { extractTitleAndYear, normalizeTitles, splitTitles } from '../src/core/titles';
+import {
+	cleanSelectedLine,
+	extractTitleAndYear,
+	normalizeTitles,
+	splitTitles,
+	titlesFromSelection,
+} from '../src/core/titles';
 
 function result(id: string, title: string, year: string | null): SearchResult {
 	return { id, title, year, overview: '', thumbnailUrl: null };
@@ -33,6 +39,36 @@ describe('titles', () => {
 			'Inception',
 			'The Matrix',
 		]);
+	});
+});
+
+describe('selected text', () => {
+	it.each([
+		['Inception', 'Inception'],
+		['  - The Matrix (1999)  ', 'The Matrix (1999)'],
+		['* Dune', 'Dune'],
+		['+ Dune', 'Dune'],
+		['3. Alien', 'Alien'],
+		['1) Alien', 'Alien'],
+		['- [ ] Heat (1995)', 'Heat (1995)'],
+		['- [x] Heat', 'Heat'],
+		['## Arrival', 'Arrival'],
+		['[[Inception (2010)]]', 'Inception (2010)'],
+		['- [[Inception (2010)|Inception]]', 'Inception (2010)'],
+		['-5 Degrees', '-5 Degrees'],
+		['1984', '1984'],
+	])('cleans %j', (line, title) => {
+		expect(cleanSelectedLine(line)).toBe(title);
+	});
+
+	it('splits a multi-line selection into titles', () => {
+		expect(
+			titlesFromSelection('- Inception\n\n- [[The Matrix (1999)]]\r\n- Inception\n'),
+		).toEqual(['Inception', 'The Matrix (1999)']);
+	});
+
+	it('returns nothing for an empty selection', () => {
+		expect(titlesFromSelection('')).toEqual([]);
 	});
 });
 

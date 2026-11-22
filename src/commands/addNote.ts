@@ -2,6 +2,7 @@ import { Notice, TFile } from 'obsidian';
 import { TmdbClient } from '../api/tmdb';
 import { addTitle } from '../core/addTitle';
 import type { MediaType } from '../core/notes';
+import { titlesFromSelection } from '../core/titles';
 import type MediaNotesPlugin from '../main';
 import { getBytes, getJson } from '../obsidian/http';
 import { resizeToJpeg } from '../obsidian/poster';
@@ -44,7 +45,13 @@ async function runAdd(
 		return;
 	}
 
-	const titles = await new TitleInputModal(app, LABELS[mediaType]).openAndWait();
+	// Selected text in the open note fills the prompt, one title per line.
+	const selection = app.workspace.activeEditor?.editor?.getSelection() ?? '';
+	const titles = await new TitleInputModal(
+		app,
+		LABELS[mediaType],
+		titlesFromSelection(selection),
+	).openAndWait();
 	if (titles.length === 0) return;
 
 	let folder: string;
