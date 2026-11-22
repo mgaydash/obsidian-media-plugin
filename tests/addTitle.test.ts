@@ -12,6 +12,7 @@ function fakeClient(results: SearchResult[]): MediaClient<FakeDetails> {
 		mediaType: 'movie',
 		search: vi.fn().mockResolvedValue(results),
 		getDetails: vi.fn((id: string) => Promise.resolve({ id, poster: `/p${id}.jpg` })),
+		getTitleAndYear: (d) => ({ title: `Film: ${d.id}`, year: '2010' }),
 		getFilename: (d) => `Film ${d.id} (2010).md`,
 		formatNote: (d, poster) => `note ${d.id} poster=${poster ?? 'none'}`,
 		getPosterUrl: (d) => d.poster,
@@ -55,7 +56,12 @@ describe('addTitle', () => {
 
 		const outcome = await addTitle('Film', d);
 
-		expect(outcome).toEqual({ status: 'created', path: 'Media/Film 1 (2010).md' });
+		expect(outcome).toEqual({
+			status: 'created',
+			path: 'Media/Film 1 (2010).md',
+			title: 'Film: 1',
+			year: '2010',
+		});
 		expect(client.search).toHaveBeenCalledWith('Film');
 		expect(d.pick).not.toHaveBeenCalled();
 		expect(notes.get('Media/Film 1 (2010).md')).toBe('note 1 poster=Film 1 (2010).jpg');
@@ -142,6 +148,8 @@ describe('addTitle', () => {
 		expect(await addTitle('Film', d)).toEqual({
 			status: 'created',
 			path: 'Media/Film 1 (2010).md',
+			title: 'Film: 1',
+			year: '2010',
 			posterWarning: 'Poster download failed: 404',
 		});
 		expect(notes.get('Media/Film 1 (2010).md')).toBe('note 1 poster=none');

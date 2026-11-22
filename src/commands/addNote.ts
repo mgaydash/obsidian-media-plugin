@@ -5,6 +5,7 @@ import type { MediaType } from '../core/notes';
 import {
 	captureSelection,
 	linkChanges,
+	linkDisplayText,
 	SelectionSegment,
 } from '../core/selection';
 import { normalizeTitles } from '../core/titles';
@@ -73,7 +74,7 @@ async function runAdd(
 
 	const client = new TmdbClient(apiKey, mediaType, getJson);
 	const width = plugin.settings.posterWidth;
-	const created = new Map<string, TFile>();
+	const created = new Map<string, CreatedNote>();
 
 	for (const input of titles) {
 		const outcome = await addTitle(input, {
@@ -90,7 +91,9 @@ async function runAdd(
 
 		if (outcome.status === 'created') {
 			const file = app.vault.getAbstractFileByPath(outcome.path);
-			if (file instanceof TFile) created.set(input, file);
+			if (file instanceof TFile) {
+				created.set(input, { file, title: outcome.title, year: outcome.year });
+			}
 			const warning = outcome.posterWarning ? ` (${outcome.posterWarning})` : '';
 			new Notice(`Created ${outcome.path}${warning}`);
 		} else if (outcome.status === 'skipped') {
@@ -104,9 +107,15 @@ async function runAdd(
 		linkSelection(plugin, view, sourceFile, segments, created);
 	} else if (titles.length === 1) {
 		// With a single typed title, open the new note, which is usually what you want next.
-		const file = [...created.values()][0];
+		const file = [...created.values()][0]?.file;
 		if (file) await app.workspace.getLeaf(false).openFile(file);
 	}
+}
+
+interface CreatedNote {
+	file: TFile;
+	title: string;
+	year: string | null;
 }
 
 /** Turn each selected line that produced a note into a link to it. */
@@ -115,7 +124,7 @@ function linkSelection(
 	view: MarkdownFileInfo | null,
 	sourceFile: TFile | null,
 	segments: SelectionSegment[],
-	created: Map<string, TFile>,
+	created: Map<string, CreatedNote>,
 ): void {
 	if (created.size === 0 || !view?.editor || !sourceFile) return;
 	// The same view may have moved on to another note while titles were added.
@@ -124,12 +133,14 @@ function linkSelection(
 		return;
 	}
 	const { editor } = view;
-	const changes = linkChanges(editor, segments, created, (file, display) =>
+	const style = plugin.settings.linkText;
+	const changes = linkChanges(editor, segments, created, (note, typed) =>
 		plugin.app.fileManager.generateMarkdownLink(
-			file,
+			note.file,
 			sourceFile.path,
 			undefined,
-			display === file.basename ? undefined : display,
+			linkDisplayText(style, { ...note, basename: note.file.basename }, typed) ??
+				undefined,
 		),
 	);
 	if (changes.length > 0) editor.transaction({ changes });

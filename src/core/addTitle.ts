@@ -26,7 +26,14 @@ export interface AddTitleDeps<Details> {
 }
 
 export type AddOutcome =
-	| { status: 'created'; path: string; posterWarning?: string }
+	| {
+			status: 'created';
+			path: string;
+			/** Title and year as the API shows them, for link text. */
+			title: string;
+			year: string | null;
+			posterWarning?: string;
+	  }
 	| { status: 'skipped'; reason: string }
 	| { status: 'failed'; message: string };
 
@@ -108,7 +115,6 @@ export async function addTitle<Details>(
 		};
 	}
 
-	return posterWarning
-		? { status: 'created', path: notePath, posterWarning }
-		: { status: 'created', path: notePath };
+	const created = { status: 'created' as const, path: notePath, ...client.getTitleAndYear(details) };
+	return posterWarning ? { ...created, posterWarning } : created;
 }

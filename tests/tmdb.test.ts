@@ -107,6 +107,14 @@ describe('TmdbClient notes', () => {
 		);
 	});
 
+	it('reports the title and year as TMDB shows them', () => {
+		expect(
+			movie.getTitleAndYear({ id: 1, title: 'Star Wars: Episode IV', release_date: '1977-05-25' }),
+		).toEqual({ title: 'Star Wars: Episode IV', year: '1977' });
+		expect(tv.getTitleAndYear(tvDetails as TmdbDetails)).toEqual({ title: 'Loot', year: '2022' });
+		expect(movie.getTitleAndYear({ id: 1, title: 'X' })).toEqual({ title: 'X', year: null });
+	});
+
 	it('refuses a filename without a year', () => {
 		expect(() => movie.getFilename({ id: 1, title: 'X' })).toThrow('release year');
 	});

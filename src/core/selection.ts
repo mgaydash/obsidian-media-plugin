@@ -46,6 +46,42 @@ export function titlesFromSelection(selection: string): string[] {
 	return normalizeTitles(selection.split(/\r?\n/).map(cleanSelectedLine));
 }
 
+/** What a link made from a selected line displays. */
+export type LinkTextStyle = 'title-year' | 'title' | 'typed' | 'note-name';
+
+export const LINK_TEXT_STYLES: Record<LinkTextStyle, string> = {
+	'title-year': 'Title and year, as TMDB shows them',
+	title: 'Title, as TMDB shows it',
+	typed: 'The text as you typed it',
+	'note-name': 'Name of the new note',
+};
+
+/**
+ * The display text for a link to a new note, or null for a plain link
+ * (when the text would just repeat the note name).
+ */
+export function linkDisplayText(
+	style: LinkTextStyle,
+	note: { basename: string; title: string; year: string | null },
+	typed: string,
+): string | null {
+	let text: string;
+	switch (style) {
+		case 'title-year':
+			text = note.year ? `${note.title} (${note.year})` : note.title;
+			break;
+		case 'title':
+			text = note.title;
+			break;
+		case 'typed':
+			text = typed;
+			break;
+		case 'note-name':
+			return null;
+	}
+	return text === note.basename ? null : text;
+}
+
 /** A selected line with its position in the editor. */
 export interface SelectionSegment {
 	line: number;

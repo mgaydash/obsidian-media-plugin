@@ -22,6 +22,8 @@ export interface MediaClient<Details = unknown> {
 	readonly mediaType: MediaType;
 	search(title: string): Promise<SearchResult[]>;
 	getDetails(id: string): Promise<Details>;
+	/** The title and year as the API shows them, before filename cleanup. */
+	getTitleAndYear(details: Details): { title: string; year: string | null };
 	/** "Title (Year).md". Throws when the year is unknown. */
 	getFilename(details: Details): string;
 	/** Full note text. `poster` is the poster file name, when there is one. */

@@ -91,10 +91,17 @@ export class TmdbClient implements MediaClient<TmdbDetails> {
 		)) as TmdbDetails;
 	}
 
-	getFilename(details: TmdbDetails): string {
+	getTitleAndYear(details: TmdbDetails): { title: string; year: string | null } {
 		const isMovie = this.mediaType === 'movie';
-		const year = ((isMovie ? details.release_date : details.first_air_date) ?? '').slice(0, 4);
-		const title = (isMovie ? details.title : details.name) ?? 'Unknown';
+		const date = (isMovie ? details.release_date : details.first_air_date) ?? '';
+		return {
+			title: (isMovie ? details.title : details.name) ?? 'Unknown',
+			year: date.slice(0, 4) || null,
+		};
+	}
+
+	getFilename(details: TmdbDetails): string {
+		const { title, year } = this.getTitleAndYear(details);
 		if (!year) throw new Error('Could not determine release year');
 		return `${sanitizeFilename(title)} (${year}).md`;
 	}

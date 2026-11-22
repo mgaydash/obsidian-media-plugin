@@ -79,8 +79,11 @@ tests/                      # Vitest; fixtures copied from the CLI repo
   prefix (bullets, numbering, checkbox, heading marks) and a body whose title
   is searched. After the run, `linkChanges()` replaces each body whose title
   produced a note with `fileManager.generateMarkdownLink()` (so the user's
-  wikilink/Markdown setting is respected), aliased to the original display
-  text when it differs from the note name. All edits go in one
+  wikilink/Markdown setting is respected). The alias comes from the
+  `linkText` setting via `linkDisplayText()`: TMDB title + year (default),
+  TMDB title, the typed text, or none (note name). It is dropped when it
+  equals the note name. Clients expose `getTitleAndYear()` for this, and
+  `addTitle()` returns it on a created outcome. All edits go in one
   `editor.transaction()` (one undo). Lines are matched by title, so a title
   edited in the prompt is not linked; a line whose text changed meanwhile is
   skipped, and nothing is linked if the view moved to another note. With a

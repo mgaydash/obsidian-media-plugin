@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { EditorPosition } from 'obsidian';
-import { captureSelection, linkChanges, parseSelectedLine } from '../src/core/selection';
+import {
+	captureSelection,
+	linkChanges,
+	linkDisplayText,
+	LinkTextStyle,
+	parseSelectedLine,
+} from '../src/core/selection';
 
 /** Minimal stand-in for Obsidian's Editor over an array of lines. */
 function fakeEditor(lines: string[], from: EditorPosition, to: EditorPosition) {
@@ -27,6 +33,30 @@ describe('parseSelectedLine', () => {
 		['- [[Alien]]', '- ', '[[Alien]]', 'Alien', 'Alien'],
 	])('parses %j', (line, prefix, body, title, display) => {
 		expect(parseSelectedLine(line)).toEqual({ prefix, body, title, display });
+	});
+});
+
+describe('linkDisplayText', () => {
+	// Note names are sanitized ("Star Wars - Episode IV (1977)"), TMDB titles are not.
+	const note = { basename: 'Star Wars - Episode IV (1977)', title: 'Star Wars: Episode IV', year: '1977' };
+
+	it.each<[LinkTextStyle, string | null]>([
+		['title-year', 'Star Wars: Episode IV (1977)'],
+		['title', 'Star Wars: Episode IV'],
+		['typed', 'star wars'],
+		['note-name', null],
+	])('%s', (style, expected) => {
+		expect(linkDisplayText(style, note, 'star wars')).toBe(expected);
+	});
+
+	it('skips the alias when it would repeat the note name', () => {
+		const plain = { basename: 'Inception (2010)', title: 'Inception', year: '2010' };
+		expect(linkDisplayText('title-year', plain, 'x')).toBeNull();
+		expect(linkDisplayText('typed', plain, 'Inception (2010)')).toBeNull();
+	});
+
+	it('leaves out a missing year', () => {
+		expect(linkDisplayText('title-year', { basename: 'X', title: 'Y', year: null }, '')).toBe('Y');
 	});
 });
 

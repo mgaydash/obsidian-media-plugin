@@ -14,9 +14,19 @@ one or more titles, one per line. If you have text selected in a note, the
 prompt starts filled with it, one title per selected line. List bullets, task
 checkboxes, headings and `[[wikilink]]` brackets are removed, so a selected
 watchlist works as is. When it finishes, each selected line whose note was
-created becomes a link to that note, keeping the text you see
-(`- Inception` becomes `- [[Inception (2010)|Inception]]`). For each title the
-plugin:
+created becomes a link to that note. Bullets and checkboxes stay, and the
+**Link text** setting decides what the link shows:
+
+| Link text | `- mission impossible` becomes |
+| --- | --- |
+| Title and year, as TMDB shows them (default) | `- [[Mission - Impossible (1996)\|Mission: Impossible (1996)]]` |
+| Title, as TMDB shows it | `- [[Mission - Impossible (1996)\|Mission: Impossible]]` |
+| The text as you typed it | `- [[Mission - Impossible (1996)\|mission impossible]]` |
+| Name of the new note | `- [[Mission - Impossible (1996)]]` |
+
+The display text is left out when it would just repeat the note name.
+
+For each title the plugin:
 
 1. Searches TMDB. Add a year to narrow the search: `Dune (2021)`.
 2. Picks the result automatically when exactly one title matches. Otherwise

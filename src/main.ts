@@ -1,5 +1,6 @@
 import { Plugin } from 'obsidian';
 import { registerAddCommands } from './commands/addNote';
+import { LINK_TEXT_STYLES } from './core/selection';
 import {
 	DEFAULT_SETTINGS,
 	MediaNotesSettings,
@@ -18,6 +19,9 @@ export default class MediaNotesPlugin extends Plugin {
 	async loadSettings(): Promise<void> {
 		const saved = (await this.loadData()) as Partial<MediaNotesSettings> | null;
 		this.settings = { ...DEFAULT_SETTINGS, ...saved };
+		if (!(this.settings.linkText in LINK_TEXT_STYLES)) {
+			this.settings.linkText = DEFAULT_SETTINGS.linkText;
+		}
 	}
 
 	async saveSettings(): Promise<void> {

@@ -6,6 +6,7 @@ import {
 	Setting,
 	TFolder,
 } from 'obsidian';
+import { LINK_TEXT_STYLES, LinkTextStyle } from './core/selection';
 import type MediaNotesPlugin from './main';
 
 export interface MediaNotesSettings {
@@ -18,12 +19,15 @@ export interface MediaNotesSettings {
 	notesFolder: string;
 	/** Poster width in pixels. */
 	posterWidth: number;
+	/** Display text for links made from selected lines. */
+	linkText: LinkTextStyle;
 }
 
 export const DEFAULT_SETTINGS: MediaNotesSettings = {
 	tmdbSecretId: '',
 	notesFolder: '',
 	posterWidth: 200,
+	linkText: 'title-year',
 };
 
 class FolderSuggest extends AbstractInputSuggest<TFolder> {
@@ -94,6 +98,21 @@ export class MediaNotesSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					});
 			});
+
+		new Setting(containerEl)
+			.setName('Link text')
+			.setDesc(
+				'When you add titles from selected text, each line becomes a link to its new note. Choose what the link shows.',
+			)
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOptions(LINK_TEXT_STYLES)
+					.setValue(settings.linkText)
+					.onChange(async (value) => {
+						settings.linkText = value as LinkTextStyle;
+						await this.plugin.saveSettings();
+					}),
+			);
 
 		new Setting(containerEl)
 			.setName('Poster width')
