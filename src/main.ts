@@ -1,5 +1,6 @@
 import { Plugin } from 'obsidian';
 import { registerAddCommands } from './commands/addNote';
+import { registerScaffoldCommand } from './commands/scaffold';
 import { LINK_TEXT_STYLES } from './core/selection';
 import {
 	DEFAULT_SETTINGS,
@@ -14,6 +15,7 @@ export default class MediaNoteCreatorPlugin extends Plugin {
 		await this.loadSettings();
 		this.addSettingTab(new MediaNoteCreatorSettingTab(this.app, this));
 		registerAddCommands(this);
+		registerScaffoldCommand(this);
 	}
 
 	async loadSettings(): Promise<void> {

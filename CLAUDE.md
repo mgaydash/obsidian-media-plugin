@@ -55,6 +55,7 @@ src/
 │   ├── disambiguation.ts   # Year filter, exact match, selectResult()
 │   ├── genres.ts           # Genre -> tag table (port of genre_mappings.yaml)
 │   ├── notes.ts            # Frontmatter, filenames, collections
+│   ├── scaffold.ts         # Collection page + .base contents, create/skip plan
 │   ├── selection.ts        # Selected lines -> titles, and -> link edits
 │   └── titles.ts           # "Title (Year)" parsing, title list cleanup
 ├── obsidian/               # Thin wrappers over Obsidian APIs
@@ -64,6 +65,7 @@ src/
 ├── ui/                     # Modals, each with an openAndWait() promise
 └── commands/
     ├── addNote.ts          # One "Add <type> note" command per media type
+    ├── scaffold.ts         # "Create collection pages and bases" command
     └── clients.ts          # createClient(): Keychain keys -> API client
 tests/                      # Vitest; fixtures copied from the CLI repo
 ```
@@ -134,6 +136,14 @@ tests/                      # Vitest; fixtures copied from the CLI repo
   edited in the prompt is not linked; a line whose text changed meanwhile is
   skipped, and nothing is linked if the view moved to another note. With a
   selection, the new note is not opened.
+- **Collection pages and bases** (`core/scaffold.ts`): `Movies.md` embeds
+  `![[Movies Base.base#Covers]]`, the naming used in Mitchell's vault
+  (`Lookups Base.base`). Bases filter on `collection == link("Movies")`, never
+  `file.hasLink()` (matches body mentions) or `contains()` (substring). The
+  command never overwrites: a file is skipped when a link to its name already
+  resolves anywhere in the vault (`getFirstLinkpathDest`) or its path exists.
+  Pages have no frontmatter; vault-specific bits (`collection: [[Index]]`,
+  `cssclasses`, rating/status columns) are the user's to add.
 - **`SuggestModal` calls `onClose` before `onChooseSuggestion`**, so
   `ResultSuggestModal` resolves on the next tick. Keep that pattern in new
   pick lists.

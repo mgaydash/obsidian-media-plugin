@@ -58,6 +58,23 @@ For each title the plugin:
 
 If a note with that name already exists, you are asked before it is replaced.
 
+## Collection pages
+
+Every note links to its collection page, such as `[[Movies]]`. Run
+**Create collection pages and bases** to make those pages, each showing its
+notes through an [Obsidian Bases](https://help.obsidian.md/bases) view. For
+each collection it creates, in the notes folder:
+
+- `Movies Base.base`, listing every note whose `collection` is `[[Movies]]`,
+  with a **Covers** card view (newest first) and a **Table** view. Lookups get
+  an A–Z table grouped by first letter and a **Recently updated** view.
+- `Movies.md`, which embeds the base's first view.
+
+It never replaces a file. A page or base that already exists anywhere in the
+vault is left alone, and you see what will be created before anything is
+written. If you rename a collection page later, also change the name inside
+`link("...")` in its base, which Obsidian does not update for you.
+
 ## Install
 
 Until Media Note Creator is in the community plugin list, install it with
