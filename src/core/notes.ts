@@ -3,7 +3,7 @@
  * `lib/obsidian_utils.py`.
  */
 
-export type MediaType = 'movie' | 'tv' | 'game' | 'album' | 'book';
+export type MediaType = 'movie' | 'tv' | 'game' | 'album' | 'book' | 'lookup';
 
 /** Media type -> the collection note a new note belongs to. */
 export const COLLECTION_BY_MEDIA_TYPE: Record<MediaType, string> = {
@@ -12,6 +12,7 @@ export const COLLECTION_BY_MEDIA_TYPE: Record<MediaType, string> = {
 	game: 'Games',
 	album: 'Albums',
 	book: 'Books',
+	lookup: 'Lookups',
 };
 
 export function wikilink(text: string): string {

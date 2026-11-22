@@ -115,7 +115,8 @@ export async function addTitle<Details>(
 		} catch (err) {
 			posterWarning = `Poster download failed: ${errorText(err)}`;
 		}
-	} else {
+	} else if (client.mediaType !== 'lookup') {
+		// Words never have cover art, so saying so would be noise.
 		posterWarning = 'No poster available';
 	}
 

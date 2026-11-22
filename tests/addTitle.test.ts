@@ -164,7 +164,14 @@ describe('addTitle', () => {
 		expect(d.fetchPoster).not.toHaveBeenCalled();
 	});
 
-	it('reports a failed note write', async () => {
+	it('stays quiet about posters for word lookups', async () => {
+		const client = { ...fakeClient([r('1', 'Film', '2010')]), mediaType: 'lookup' as const };
+		client.getPosterUrl = () => null;
+		const { d } = deps(client);
+		expect(await addTitle('Film', d)).not.toHaveProperty('posterWarning');
+	});
+
+		it('reports a failed note write', async () => {
 		const { d } = deps(fakeClient([r('1', 'Film', '2010')]), {
 			writeNote: () => Promise.reject(new Error('disk full')),
 		});
