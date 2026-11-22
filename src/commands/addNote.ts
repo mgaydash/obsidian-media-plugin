@@ -91,8 +91,8 @@ async function runAdd(
 		});
 
 		if (outcome.status === 'created') {
-			const file = app.vault.getAbstractFileByPath(outcome.path);
-			if (file instanceof TFile) {
+			const file = app.vault.getFileByPath(outcome.path);
+			if (file) {
 				created.set(input, { file, title: outcome.title, year: outcome.year });
 			}
 			const warning = outcome.posterWarning ? ` (${outcome.posterWarning})` : '';
