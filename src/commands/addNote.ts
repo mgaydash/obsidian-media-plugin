@@ -9,7 +9,7 @@ import {
 	SelectionSegment,
 } from '../core/selection';
 import { normalizeTitles } from '../core/titles';
-import type MediaNotesPlugin from '../main';
+import type MediaNoteCreatorPlugin from '../main';
 import { getBytes } from '../obsidian/http';
 import { resizeToJpeg } from '../obsidian/poster';
 import {
@@ -32,7 +32,7 @@ const COMMANDS: Record<MediaType, { id: string; name: string; heading: string }>
 	lookup: { id: 'add-word-lookup', name: 'Add word lookup', heading: 'Add word lookups' },
 };
 
-export function registerAddCommands(plugin: MediaNotesPlugin): void {
+export function registerAddCommands(plugin: MediaNoteCreatorPlugin): void {
 	for (const [mediaType, command] of Object.entries(COMMANDS) as [MediaType, (typeof COMMANDS)[MediaType]][]) {
 		plugin.addCommand({
 			id: command.id,
@@ -43,7 +43,7 @@ export function registerAddCommands(plugin: MediaNotesPlugin): void {
 }
 
 async function runAdd(
-	plugin: MediaNotesPlugin,
+	plugin: MediaNoteCreatorPlugin,
 	mediaType: MediaType,
 ): Promise<void> {
 	const { app } = plugin;
@@ -121,7 +121,7 @@ interface CreatedNote {
 
 /** Turn each selected line that produced a note into a link to it. */
 function linkSelection(
-	plugin: MediaNotesPlugin,
+	plugin: MediaNoteCreatorPlugin,
 	view: MarkdownFileInfo | null,
 	sourceFile: TFile | null,
 	segments: SelectionSegment[],

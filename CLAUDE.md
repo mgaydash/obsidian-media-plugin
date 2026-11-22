@@ -7,19 +7,22 @@ this plugin. Keep it current when the structure or workflow changes.
 
 ## What this is
 
-**Media Notes** (`id: media-notes`) is an Obsidian plugin that creates media
+**Media Note Creator** (`id: media-note-creator`) is an Obsidian plugin that creates media
 notes from online APIs. It is a TypeScript port of the Python CLI in
 `mgaydash/obsidian-tools`, and its notes must match what the CLI writes.
 
 Status: feature-complete (movies and TV via TMDB; games via IGDB, albums via
 MusicBrainz, books via Google Books; word lookups via the Free Dictionary API
-with a Wiktionary fallback). Next: the 0.1.0 release (BRAT first), then
-community store submission.
+with a Wiktionary fallback). Next: the 0.2.0 release under the new name,
+then community store submission.
 
 ## Decisions (do not revisit without asking)
 
-- **Plugin id is `media-notes`** and can never change after release. Ids may
-  not contain "obsidian", which is why it differs from the repo name.
+- **Plugin id is `media-note-creator`** and can never change once it is in the
+  store. It was `media-notes` for the 0.1.0 BRAT release, renamed in 0.2.0
+  because the store already has a "Media Notes" plugin with that id. Ids may
+  not contain "obsidian", which is why it differs from the repo name. CSS
+  classes use the `media-note-creator-` prefix.
 - **API keys live in the Obsidian Keychain** (`app.secretStorage`), never in
   `data.json`. Settings store only the Keychain entry name (`tmdbSecretId`),
   chosen with a `SecretComponent`. This sets `minAppVersion` to 1.11.4.

@@ -1,6 +1,6 @@
 {
-	"name": "media-notes",
-	"version": "0.1.0",
+	"name": "media-note-creator",
+	"version": "0.2.0",
 	"description": "Create notes for movies, TV shows, games, albums, books and word lookups, with cover art.",
 	"main": "main.js",
 	"type": "module",
