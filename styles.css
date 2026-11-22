@@ -1,0 +1,20 @@
+.media-notes-titles {
+	width: 100%;
+	font-family: var(--font-interface);
+}
+
+.media-notes-suggestion {
+	display: flex;
+	gap: var(--size-4-3);
+	align-items: flex-start;
+}
+
+.media-notes-thumb {
+	width: 40px;
+	flex-shrink: 0;
+	border-radius: var(--radius-s);
+}
+
+.media-notes-overview {
+	color: var(--text-muted);
+}
