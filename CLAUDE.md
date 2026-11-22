@@ -11,10 +11,10 @@ this plugin. Keep it current when the structure or workflow changes.
 notes from online APIs. It is a TypeScript port of the Python CLI in
 `mgaydash/obsidian-tools`, and its notes must match what the CLI writes.
 
-Status: milestones 1 and 2 of 5 done (movies and TV via TMDB; games via
-IGDB, albums via MusicBrainz, books via Google Books). Next: lookups (Free
-Dictionary), a "download missing posters" command, then community store
-submission.
+Status: milestones 1 to 3 of 5 done (movies and TV via TMDB; games via
+IGDB, albums via MusicBrainz, books via Google Books; word lookups via the
+Free Dictionary API with a Wiktionary fallback). Next: a "download missing
+posters" command, then community store submission.
 
 ## Decisions (do not revisit without asking)
 
@@ -43,7 +43,8 @@ src/
 │   ├── tmdb.ts             # TMDB (movies + TV)
 │   ├── igdb.ts             # IGDB (games), Twitch client-credentials sign-in
 │   ├── musicbrainz.ts      # MusicBrainz (albums) + Cover Art Archive
-│   └── googlebooks.ts      # Google Books (books), edition grouping + retries
+│   ├── googlebooks.ts      # Google Books (books), edition grouping + retries
+│   └── dictionary.ts       # Word lookups: Free Dictionary, Wiktionary fallback
 ├── core/                   # Pure logic, no `obsidian` import, unit-tested
 │   ├── addTitle.ts         # The add workflow (port of CLI process_title)
 │   ├── disambiguation.ts   # Year filter, exact match, selectResult()
@@ -86,6 +87,19 @@ tests/                      # Vitest; fixtures copied from the CLI repo
   release-group tags and falling back to release tags. Google Books groups
   editions by (title, author) and remembers the earliest year per stand-in
   volume for `getDetails()`.
+- **Word lookups** (`mediaType: 'lookup'`, collection `[[Lookups]]`): an
+  exact lookup, not a search. The primary (`api.dictionaryapi.dev`, 8 s
+  timeout) is a flaky community proxy; any `HttpError` other than 404 trips
+  a per-client circuit breaker (`primaryFailed`) and that word and the rest
+  of the batch go to Wiktionary (`en.wiktionary.org/api/rest_v1/page/definition`,
+  15 s, English section only, HTML stripped, one entry, no pronunciation or
+  synonyms). A 404 means the word is not in Wiktionary, so it never falls
+  back. Entries are cached by `word#index` in `search()` for `getDetails()`.
+  Homographs are separate results, so they always prompt. Part of speech is
+  the tag (not run through the genre table). Filename `Word.md`, no poster,
+  and `addTitle()` skips the "no poster" warning for lookups.
+  `HttpRequest.timeoutMs` is implemented in `obsidian/http.ts` by racing
+  `requestUrl` against a timer, since `requestUrl` has no timeout.
 - **Unreleased games**: `addTitle()` asks before adding a game whose exact
   match has no release date (`SearchResult.year === null`), only on the
   exact-match path, as in the CLI. Games, albums and books with no year get

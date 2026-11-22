@@ -29,6 +29,7 @@ const COMMANDS: Record<MediaType, { id: string; name: string; heading: string }>
 	game: { id: 'add-game-note', name: 'Add game note', heading: 'Add game notes' },
 	album: { id: 'add-album-note', name: 'Add album note', heading: 'Add album notes' },
 	book: { id: 'add-book-note', name: 'Add book note', heading: 'Add book notes' },
+	lookup: { id: 'add-word-lookup', name: 'Add word lookup', heading: 'Add word lookups' },
 };
 
 export function registerAddCommands(plugin: MediaNotesPlugin): void {

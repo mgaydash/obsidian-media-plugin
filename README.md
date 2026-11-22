@@ -1,7 +1,7 @@
 # Media Notes
 
 An Obsidian plugin that creates notes for movies, TV shows, games, albums and
-books, with cover art. It is a port of the
+books, with cover art, and for words you look up. It is a port of the
 [obsidian-tools](https://github.com/mgaydash/obsidian-tools) command-line tool,
 and writes the same notes it does.
 
@@ -12,8 +12,15 @@ and writes the same notes it does.
 | **Add game note** | [IGDB](https://www.igdb.com/) | `Title (Year).md` | `[[Games]]` |
 | **Add album note** | [MusicBrainz](https://musicbrainz.org/) and the Cover Art Archive | `Artist - Album (Year).md` | `[[Albums]]` |
 | **Add book note** | [Google Books](https://books.google.com/) | `Author - Title (Year).md` | `[[Books]]` |
+| **Add word lookup** | [Free Dictionary API](https://dictionaryapi.dev/), falling back to [Wiktionary](https://en.wiktionary.org/) | `Word.md` | `[[Lookups]]` |
 
-Word lookups are coming in a later release.
+A word lookup writes the pronunciation, definitions with examples, synonyms
+and antonyms (as links), and a source line crediting Wiktionary, whose text is
+CC BY-SA. Words with several origins, such as "bass" the fish and "bass" the
+sound, appear as separate choices. Lookups have no cover and use the part of
+speech as the tag. If the Free Dictionary API is down, the plugin switches to
+Wiktionary for the rest of the batch; those notes have definitions but no
+pronunciation or synonyms.
 
 ## What it does
 
@@ -61,7 +68,7 @@ it in.
 | --- | --- | --- |
 | Movies, TV | TMDB API key | themoviedb.org → **Settings → API** |
 | Games | Twitch client ID and client secret | Register an application at [dev.twitch.tv](https://dev.twitch.tv/console/apps) ([IGDB guide](https://api-docs.igdb.com/#account-creation)) |
-| Albums | None | |
+| Albums, words | None | |
 | Books | Google Books API key | [Google Cloud console](https://console.cloud.google.com/): turn on the Books API, then create an API key |
 
 Optionally choose a **Notes folder**. When empty, notes go to the
@@ -83,9 +90,10 @@ and your key for that service. Nothing else from your vault leaves your device.
 | Games | `id.twitch.tv` (sign-in), `api.igdb.com`, `images.igdb.com` |
 | Albums | `musicbrainz.org`, `coverartarchive.org` (and `archive.org`, where covers are stored) |
 | Books | `www.googleapis.com`, `books.google.com` |
+| Words | `api.dictionaryapi.dev`, and `en.wiktionary.org` when that is down |
 
-MusicBrainz requests carry a User-Agent naming this plugin, as MusicBrainz
-requires, and are spaced at least one second apart.
+MusicBrainz and dictionary requests carry a User-Agent naming this plugin.
+MusicBrainz requests are spaced at least one second apart, as it asks.
 
 ## Development
 

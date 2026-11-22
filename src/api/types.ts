@@ -8,6 +8,8 @@ export interface HttpRequest {
 	method?: 'GET' | 'POST';
 	headers?: Record<string, string>;
 	body?: string;
+	/** Give up after this long, as a network error. */
+	timeoutMs?: number;
 }
 
 /** Send a request and parse the JSON body. Throws `HttpError` on a 4xx/5xx response. */

@@ -86,7 +86,7 @@ export class MediaNotesSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName('API keys').setHeading();
 		containerEl.createEl('p', {
 			cls: 'setting-item-description',
-			text: 'Keys are stored in the Obsidian Keychain, not in this plugin’s settings file. Albums need no key.',
+			text: 'Keys are stored in the Obsidian Keychain, not in this plugin’s settings file. Albums and word lookups need no key.',
 		});
 		this.secretSetting(
 			'TMDB API key',
