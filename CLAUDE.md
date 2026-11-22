@@ -162,6 +162,11 @@ draft GitHub release with `main.js`, `manifest.json` and `styles.css`.
 3. Publish the draft release that `release.yml` creates. BRAT and the store
    both read the latest published release.
 
+The store listing is made once, through the dashboard at
+community.obsidian.md (not a pull request to `obsidian-releases`). It reads
+`manifest.json` from the head of `main` and runs an automated review; fixes
+ship as a new release. Later releases need no resubmission.
+
 Store guidelines to keep: `vault.process()` (not `modify`) to rewrite a note,
 `getFileByPath()`, `normalizePath()` on user paths, no `console.log`, no
 inline styles, sentence-case UI text, network use and needed accounts
