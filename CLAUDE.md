@@ -45,6 +45,7 @@ src/
 │   ├── disambiguation.ts   # Year filter, exact match, selectResult()
 │   ├── genres.ts           # Genre -> tag table (port of genre_mappings.yaml)
 │   ├── notes.ts            # Frontmatter, filenames, collections
+│   ├── selection.ts        # Selected lines -> titles, and -> link edits
 │   └── titles.ts           # "Title (Year)" parsing, title list cleanup
 ├── obsidian/               # Thin wrappers over Obsidian APIs
 │   ├── http.ts             # requestUrl -> getJson/getBytes
@@ -72,11 +73,18 @@ tests/                      # Vitest; fixtures copied from the CLI repo
   added, the CLI rewrites YAML with PyYAML (single quotes, unindented lists);
   the plugin keeps the double-quoted, indented style. The parsed values are
   identical.
-- **Selected text prefills the title prompt.** `commands/addNote.ts` reads
-  `workspace.activeEditor?.editor?.getSelection()`, and
-  `titlesFromSelection()` in `core/titles.ts` turns each line into a title,
-  dropping bullets, numbering, checkboxes, headings and wikilink brackets
-  (an alias keeps the link target). The user can still edit before adding.
+- **Selected text prefills the title prompt, then becomes links.**
+  `captureSelection()` in `core/selection.ts` records each selected line
+  (line, start column, text) and `parseSelectedLine()` splits it into a kept
+  prefix (bullets, numbering, checkbox, heading marks) and a body whose title
+  is searched. After the run, `linkChanges()` replaces each body whose title
+  produced a note with `fileManager.generateMarkdownLink()` (so the user's
+  wikilink/Markdown setting is respected), aliased to the original display
+  text when it differs from the note name. All edits go in one
+  `editor.transaction()` (one undo). Lines are matched by title, so a title
+  edited in the prompt is not linked; a line whose text changed meanwhile is
+  skipped, and nothing is linked if the view moved to another note. With a
+  selection, the new note is not opened.
 - **`SuggestModal` calls `onClose` before `onChooseSuggestion`**, so
   `ResultSuggestModal` resolves on the next tick. Keep that pattern in new
   pick lists.

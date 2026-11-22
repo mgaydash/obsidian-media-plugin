@@ -1,8 +1,13 @@
-import { Notice, TFile } from 'obsidian';
+import { MarkdownFileInfo, Notice, TFile } from 'obsidian';
 import { TmdbClient } from '../api/tmdb';
 import { addTitle } from '../core/addTitle';
 import type { MediaType } from '../core/notes';
-import { titlesFromSelection } from '../core/titles';
+import {
+	captureSelection,
+	linkChanges,
+	SelectionSegment,
+} from '../core/selection';
+import { normalizeTitles } from '../core/titles';
 import type MediaNotesPlugin from '../main';
 import { getBytes, getJson } from '../obsidian/http';
 import { resizeToJpeg } from '../obsidian/poster';
@@ -46,11 +51,15 @@ async function runAdd(
 	}
 
 	// Selected text in the open note fills the prompt, one title per line.
-	const selection = app.workspace.activeEditor?.editor?.getSelection() ?? '';
+	// Remember where it was so those lines can be linked afterwards.
+	const view = app.workspace.activeEditor;
+	const sourceFile = view?.file ?? null;
+	const segments: SelectionSegment[] =
+		view?.editor && sourceFile ? captureSelection(view.editor) : [];
 	const titles = await new TitleInputModal(
 		app,
 		LABELS[mediaType],
-		titlesFromSelection(selection),
+		normalizeTitles(segments.map((s) => s.parsed.title)),
 	).openAndWait();
 	if (titles.length === 0) return;
 
@@ -64,7 +73,7 @@ async function runAdd(
 
 	const client = new TmdbClient(apiKey, mediaType, getJson);
 	const width = plugin.settings.posterWidth;
-	const created: string[] = [];
+	const created = new Map<string, TFile>();
 
 	for (const input of titles) {
 		const outcome = await addTitle(input, {
@@ -80,7 +89,8 @@ async function runAdd(
 		});
 
 		if (outcome.status === 'created') {
-			created.push(outcome.path);
+			const file = app.vault.getAbstractFileByPath(outcome.path);
+			if (file instanceof TFile) created.set(input, file);
 			const warning = outcome.posterWarning ? ` (${outcome.posterWarning})` : '';
 			new Notice(`Created ${outcome.path}${warning}`);
 		} else if (outcome.status === 'skipped') {
@@ -90,9 +100,37 @@ async function runAdd(
 		}
 	}
 
-	// With a single title, open the new note, which is usually what you want next.
-	if (titles.length === 1 && created[0]) {
-		const file = app.vault.getAbstractFileByPath(created[0]);
-		if (file instanceof TFile) await app.workspace.getLeaf(false).openFile(file);
+	if (segments.length > 0) {
+		linkSelection(plugin, view, sourceFile, segments, created);
+	} else if (titles.length === 1) {
+		// With a single typed title, open the new note, which is usually what you want next.
+		const file = [...created.values()][0];
+		if (file) await app.workspace.getLeaf(false).openFile(file);
 	}
+}
+
+/** Turn each selected line that produced a note into a link to it. */
+function linkSelection(
+	plugin: MediaNotesPlugin,
+	view: MarkdownFileInfo | null,
+	sourceFile: TFile | null,
+	segments: SelectionSegment[],
+	created: Map<string, TFile>,
+): void {
+	if (created.size === 0 || !view?.editor || !sourceFile) return;
+	// The same view may have moved on to another note while titles were added.
+	if (view.file?.path !== sourceFile.path) {
+		new Notice(`Did not add links: ${sourceFile.basename} is no longer open.`);
+		return;
+	}
+	const { editor } = view;
+	const changes = linkChanges(editor, segments, created, (file, display) =>
+		plugin.app.fileManager.generateMarkdownLink(
+			file,
+			sourceFile.path,
+			undefined,
+			display === file.basename ? undefined : display,
+		),
+	);
+	if (changes.length > 0) editor.transaction({ changes });
 }

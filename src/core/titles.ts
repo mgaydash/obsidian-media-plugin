@@ -8,27 +8,6 @@ export function splitTitles(text: string): string[] {
 	return normalizeTitles(text.split(/\r?\n/));
 }
 
-/**
- * Turn a line of selected note text into a title: drop list bullets,
- * numbering, task checkboxes, headings and wikilink brackets.
- *
- * "- [ ] [[Inception (2010)|Inception]]" -> "Inception (2010)"
- */
-export function cleanSelectedLine(line: string): string {
-	return line
-		.trim()
-		.replace(/^#{1,6}\s+/, '')
-		.replace(/^(?:[-*+]|\d+[.)])\s+/, '')
-		.replace(/^\[.\]\s+/, '')
-		.replace(/\[\[([^\]|]+)(?:\|[^\]]*)?\]\]/g, '$1')
-		.trim();
-}
-
-/** Titles from selected note text, one per line. */
-export function titlesFromSelection(selection: string): string[] {
-	return normalizeTitles(selection.split(/\r?\n/).map(cleanSelectedLine));
-}
-
 /** Strip whitespace, drop empty entries and de-duplicate, keeping order. */
 export function normalizeTitles(titles: string[]): string[] {
 	const seen = new Set<string>();

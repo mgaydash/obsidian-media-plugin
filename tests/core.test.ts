@@ -7,13 +7,8 @@ import {
 } from '../src/core/disambiguation';
 import { translateGenreTag } from '../src/core/genres';
 import { buildFrontmatter, sanitizeFilename } from '../src/core/notes';
-import {
-	cleanSelectedLine,
-	extractTitleAndYear,
-	normalizeTitles,
-	splitTitles,
-	titlesFromSelection,
-} from '../src/core/titles';
+import { cleanSelectedLine, titlesFromSelection } from '../src/core/selection';
+import { extractTitleAndYear, normalizeTitles, splitTitles } from '../src/core/titles';
 
 function result(id: string, title: string, year: string | null): SearchResult {
 	return { id, title, year, overview: '', thumbnailUrl: null };

@@ -13,7 +13,10 @@ Run **Add movie note** or **Add TV note** from the command palette and enter
 one or more titles, one per line. If you have text selected in a note, the
 prompt starts filled with it, one title per selected line. List bullets, task
 checkboxes, headings and `[[wikilink]]` brackets are removed, so a selected
-watchlist works as is. For each title the plugin:
+watchlist works as is. When it finishes, each selected line whose note was
+created becomes a link to that note, keeping the text you see
+(`- Inception` becomes `- [[Inception (2010)|Inception]]`). For each title the
+plugin:
 
 1. Searches TMDB. Add a year to narrow the search: `Dune (2021)`.
 2. Picks the result automatically when exactly one title matches. Otherwise
