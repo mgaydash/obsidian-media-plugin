@@ -34,8 +34,8 @@ export default defineConfig(
 			'obsidianmd/ui/sentence-case': [
 				'warn',
 				{
-					brands: ['Media Notes', 'Obsidian', 'TMDB'],
-					acronyms: ['API', 'TMDB', 'TV'],
+					brands: ['Media Notes', 'Obsidian', 'Keychain', 'TMDB', 'IGDB', 'Twitch', 'Google Books', 'MusicBrainz'],
+					acronyms: ['API', 'ID', 'IGDB', 'TMDB', 'TV'],
 				},
 			],
 		},

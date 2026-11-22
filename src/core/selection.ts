@@ -50,8 +50,8 @@ export function titlesFromSelection(selection: string): string[] {
 export type LinkTextStyle = 'title-year' | 'title' | 'typed' | 'note-name';
 
 export const LINK_TEXT_STYLES: Record<LinkTextStyle, string> = {
-	'title-year': 'Title and year, as TMDB shows them',
-	title: 'Title, as TMDB shows it',
+	'title-year': 'Title and year, as the source shows them',
+	title: 'Title, as the source shows it',
 	typed: 'The text as you typed it',
 	'note-name': 'Name of the new note',
 };

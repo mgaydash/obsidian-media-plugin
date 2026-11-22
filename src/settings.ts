@@ -15,6 +15,11 @@ export interface MediaNotesSettings {
 	 * kept in Obsidian's Keychain, never in this plugin's data.json.
 	 */
 	tmdbSecretId: string;
+	/** Keychain entries for IGDB (games), which signs in through Twitch. */
+	igdbClientIdSecretId: string;
+	igdbClientSecretSecretId: string;
+	/** Keychain entry for the Google Books API key. */
+	googleBooksSecretId: string;
 	/** Folder for new notes. Empty means Obsidian's "Default location for new notes". */
 	notesFolder: string;
 	/** Poster width in pixels. */
@@ -25,6 +30,9 @@ export interface MediaNotesSettings {
 
 export const DEFAULT_SETTINGS: MediaNotesSettings = {
 	tmdbSecretId: '',
+	igdbClientIdSecretId: '',
+	igdbClientSecretSecretId: '',
+	googleBooksSecretId: '',
 	notesFolder: '',
 	posterWidth: 200,
 	linkText: 'title-year',
@@ -56,6 +64,12 @@ class FolderSuggest extends AbstractInputSuggest<TFolder> {
 	}
 }
 
+type SecretSettingKey =
+	| 'tmdbSecretId'
+	| 'igdbClientIdSecretId'
+	| 'igdbClientSecretSecretId'
+	| 'googleBooksSecretId';
+
 export class MediaNotesSettingTab extends PluginSettingTab {
 	constructor(
 		app: App,
@@ -69,20 +83,29 @@ export class MediaNotesSettingTab extends PluginSettingTab {
 		const settings = this.plugin.settings;
 		containerEl.empty();
 
-		new Setting(containerEl)
-			.setName('TMDB API key')
-			.setDesc(
-				'Used for movies and TV. Stored in the Obsidian Keychain. Get a key at themoviedb.org under Settings → API.',
-			)
-			.addComponent((el) =>
-				new SecretComponent(this.app, el)
-					.setValue(settings.tmdbSecretId)
-					.onChange(async (value) => {
-						settings.tmdbSecretId = value ?? '';
-						await this.plugin.saveSettings();
-					}),
-			);
+		new Setting(containerEl).setName('API keys').setHeading();
+		containerEl.createEl('p', {
+			cls: 'setting-item-description',
+			text: 'Keys are stored in the Obsidian Keychain, not in this plugin’s settings file. Albums need no key.',
+		});
+		this.secretSetting(
+			'TMDB API key',
+			'Movies and TV. Get one at themoviedb.org under Settings → API.',
+			'tmdbSecretId',
+		);
+		this.secretSetting(
+			'Twitch client ID',
+			'Games, from IGDB. Register an application at dev.twitch.tv to get a client ID and secret.',
+			'igdbClientIdSecretId',
+		);
+		this.secretSetting('Twitch client secret', 'Games, from IGDB.', 'igdbClientSecretSecretId');
+		this.secretSetting(
+			'Google Books API key',
+			'Books. Create a key in the Google Cloud console with the Books API turned on.',
+			'googleBooksSecretId',
+		);
 
+		new Setting(containerEl).setName('Notes').setHeading();
 		new Setting(containerEl)
 			.setName('Notes folder')
 			.setDesc(
@@ -127,6 +150,22 @@ export class MediaNotesSettingTab extends PluginSettingTab {
 							settings.posterWidth = width;
 							await this.plugin.saveSettings();
 						}
+					}),
+			);
+	}
+
+	/** A setting that picks a Keychain entry and stores only its name. */
+	private secretSetting(name: string, desc: string, key: SecretSettingKey): void {
+		const settings = this.plugin.settings;
+		new Setting(this.containerEl)
+			.setName(name)
+			.setDesc(desc)
+			.addComponent((el) =>
+				new SecretComponent(this.app, el)
+					.setValue(settings[key])
+					.onChange(async (value) => {
+						settings[key] = value ?? '';
+						await this.plugin.saveSettings();
 					}),
 			);
 	}

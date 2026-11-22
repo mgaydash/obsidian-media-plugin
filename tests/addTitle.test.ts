@@ -173,4 +173,47 @@ describe('addTitle', () => {
 			message: 'Could not write note: disk full',
 		});
 	});
+
+	describe('unreleased games', () => {
+		function gameClient(results: SearchResult[]) {
+			return { ...fakeClient(results), mediaType: 'game' as const };
+		}
+
+		it('asks before adding an exact match with no release date, and skips on no', async () => {
+			const { d, notes } = deps(gameClient([{ ...r('1', 'Silksong', '2010'), year: null }]));
+			expect(await addTitle('Silksong', d)).toEqual({ status: 'skipped', reason: 'Unreleased' });
+			expect(d.confirm).toHaveBeenCalledWith('"Silksong" has no release date yet. Add it anyway?');
+			expect(notes.size).toBe(0);
+		});
+
+		it('adds it on yes', async () => {
+			const { d } = deps(gameClient([{ ...r('1', 'Silksong', '2010'), year: null }]), {
+				confirm: vi.fn().mockResolvedValue(true),
+			});
+			expect(await addTitle('Silksong', d)).toMatchObject({ status: 'created' });
+		});
+
+		it('does not ask for a released game, a lone non-exact result, or a picked one', async () => {
+			const released = deps(gameClient([r('1', 'Silksong', '2025')]));
+			await addTitle('Silksong', released.d);
+			expect(released.d.confirm).not.toHaveBeenCalled();
+
+			const lone = deps(gameClient([{ ...r('1', 'Silksong Deluxe', '2010'), year: null }]));
+			await addTitle('Silksong', lone.d);
+			expect(lone.d.confirm).not.toHaveBeenCalled();
+
+			const tbd = { ...r('2', 'Beta', '2010'), year: null };
+			const picked = deps(gameClient([r('1', 'Alpha', '2010'), tbd]), {
+				pick: vi.fn().mockResolvedValue(tbd),
+			});
+			await addTitle('Something', picked.d);
+			expect(picked.d.confirm).not.toHaveBeenCalled();
+		});
+
+		it('does not ask for other media types', async () => {
+			const { d } = deps(fakeClient([{ ...r('1', 'Film', '2010'), year: null }]));
+			await addTitle('Film', d);
+			expect(d.confirm).not.toHaveBeenCalled();
+		});
+	});
 });

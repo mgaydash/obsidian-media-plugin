@@ -68,6 +68,19 @@ export async function addTitle<Details>(
 		if (!selected) return { status: 'skipped', reason: 'Skipped' };
 	} else {
 		selected = selection.result;
+		// A game with no release date is often an announcement, not a game yet.
+		// Only on the exact-match path, as in the CLI: picking from the list is
+		// already a deliberate choice.
+		if (
+			client.mediaType === 'game' &&
+			selection.reason === 'exact' &&
+			selected.year === null
+		) {
+			const add = await deps.confirm(
+				`"${selected.title}" has no release date yet. Add it anyway?`,
+			);
+			if (!add) return { status: 'skipped', reason: 'Unreleased' };
+		}
 	}
 
 	let details: Details;

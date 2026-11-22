@@ -1,0 +1,39 @@
+{
+  "created": "2026-11-22T00:00:00.000Z",
+  "count": 2,
+  "offset": 0,
+  "releases": [
+    {
+      "id": "a3b7f0e5-7e7d-4e4f-8e5c-1a2b3c4d5e6f",
+      "score": 100,
+      "title": "Abbey Road",
+      "status": "Official",
+      "date": "1969-09-26",
+      "country": "GB",
+      "artist-credit": [
+        { "name": "The Beatles", "artist": { "id": "b10bbbfc", "name": "The Beatles" } }
+      ],
+      "release-group": {
+        "id": "1c3b7f0e",
+        "primary-type": "Album"
+      }
+    },
+    {
+      "id": "different-release-id",
+      "score": 90,
+      "title": "Abbey Road Sessions",
+      "status": "Official",
+      "date": "2019-09-27",
+      "disambiguation": "50th anniversary",
+      "artist-credit": [
+        { "name": "Paul McCartney", "joinphrase": " & ", "artist": { "id": "p1", "name": "Paul McCartney" } },
+        { "name": "Wings", "artist": { "id": "w1", "name": "Wings" } }
+      ],
+      "release-group": {
+        "id": "rg2",
+        "primary-type": "Album",
+        "secondary-types": ["Compilation", "Live"]
+      }
+    }
+  ]
+}
