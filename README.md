@@ -5,6 +5,8 @@ books, with cover art, and for words you look up. It is a port of the
 [obsidian-tools](https://github.com/mgaydash/obsidian-tools) command-line tool,
 and writes the same notes it does.
 
+![A Movies collection page: a grid of cards, each showing a movie's poster, title and rating](https://raw.githubusercontent.com/mgaydash/obsidian-media-plugin/main/docs/collection-page.jpg)
+
 | Command | Source | Note name | Collection |
 | --- | --- | --- | --- |
 | **Add movie note** | [TMDB](https://www.themoviedb.org/) | `Title (Year).md` | `[[Movies]]` |
