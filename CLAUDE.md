@@ -167,11 +167,19 @@ draft GitHub release with `main.js`, `manifest.json` and `styles.css`.
 
 ## Releasing
 
-1. `npm version patch` (or `minor`) on `main`. `version-bump.mjs` updates
-   `manifest.json` and `versions.json`. Keep `minAppVersion` accurate.
-2. Push the tag. It must equal the version exactly, with no leading `v`.
-3. Publish the draft release that `release.yml` creates. BRAT and the store
-   both read the latest published release.
+1. Bump the version in a PR: `npm version patch --no-git-tag-version`, then
+   `npm_package_version=<v> node version-bump.mjs` (updates `manifest.json`
+   and `versions.json`), and add a `## <v>` section to `CHANGELOG.md`. Keep
+   `minAppVersion` accurate. Threads cannot push tags; Mitchell tags.
+2. After merge, tag **the pulled `main`** (`git checkout main && git pull`,
+   then `git tag <v> && git push origin <v>`). The tag must equal the version
+   exactly, with no leading `v`. `release.yml` fails if the tag differs from
+   `manifest.json`/`package.json` or `CHANGELOG.md` has no section for it.
+   (0.3.0's assets were built from a stale commit; the store review flagged
+   the manifest and `main.js` mismatch.)
+3. Publish the draft release that `release.yml` creates, with the changelog
+   section as its notes. BRAT and the store both read the latest published
+   release.
 
 The store listing is made once, through the dashboard at
 community.obsidian.md (not a pull request to `obsidian-releases`). It reads
@@ -181,9 +189,15 @@ ship as a new release. Later releases need no resubmission.
 Store guidelines to keep: `vault.process()` (not `modify`) to rewrite a note,
 `getFileByPath()`, `normalizePath()` on user paths, no `console.log`, no
 inline styles, sentence-case UI text, network use and needed accounts
-disclosed in `README.md`. The one lint warning
-(`prefer-setting-definitions`) needs the Obsidian 1.13 settings API, above
-`minAppVersion`, and is accepted.
+disclosed in `README.md`.
+
+**Settings have two renderers.** `getSettingDefinitions()` (declarative,
+Obsidian 1.13+, which puts the settings in Obsidian's settings search) and
+`display()` (imperative, for 1.11.4 to 1.12). Obsidian skips `display()` when
+definitions exist, and older versions never call `getSettingDefinitions()`.
+Keep the two in step: shared wording is in `TEXT` in `settings.ts`, and
+`setControlValue()` applies the same cleanup as the `display()` handlers.
+Drop `display()` only if `minAppVersion` reaches 1.13.0 (lint then flags it).
 
 ## Adding a media type
 
