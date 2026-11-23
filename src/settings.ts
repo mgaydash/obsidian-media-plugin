@@ -4,6 +4,7 @@ import {
 	PluginSettingTab,
 	SecretComponent,
 	Setting,
+	SettingDefinitionItem,
 	TFolder,
 } from 'obsidian';
 import { LINK_TEXT_STYLES, LinkTextStyle } from './core/selection';
@@ -64,6 +65,27 @@ class FolderSuggest extends AbstractInputSuggest<TFolder> {
 	}
 }
 
+/** Shared text, so both settings renderers say the same thing. */
+const TEXT = {
+	keysNote:
+		'Keys are stored in the Obsidian Keychain, not in this plugin’s settings file. Albums and word lookups need no key.',
+	tmdb: 'Movies and TV. Get one at themoviedb.org under Settings → API.',
+	twitchId:
+		'Games, from IGDB. Register an application at dev.twitch.tv to get a client ID and secret.',
+	twitchSecret: 'Games, from IGDB.',
+	googleBooks: 'Books. Create a key in the Google Cloud console with the Books API turned on.',
+	notesFolder:
+		'Where new notes go. Leave empty to use the default location for new notes from Obsidian’s own settings.',
+	linkText:
+		'When you add titles from selected text, each line becomes a link to its new note. Choose what the link shows.',
+	posterWidth: 'Width in pixels. Height follows the image’s shape.',
+};
+
+/** A valid poster width: a whole number of pixels above zero. */
+export function isValidPosterWidth(value: unknown): value is number {
+	return typeof value === 'number' && Number.isInteger(value) && value > 0;
+}
+
 type SecretSettingKey =
 	| 'tmdbSecretId'
 	| 'igdbClientIdSecretId'
@@ -78,6 +100,115 @@ export class MediaNoteCreatorSettingTab extends PluginSettingTab {
 		super(app, plugin);
 	}
 
+	/**
+	 * Declarative settings (Obsidian 1.13+), which also makes them appear in
+	 * Obsidian's settings search. When this returns items, Obsidian does not
+	 * call display(); display() stays for 1.11.4 to 1.12, below which this
+	 * method is never called.
+	 */
+	getSettingDefinitions(): SettingDefinitionItem[] {
+		return [
+			{
+				type: 'group',
+				heading: 'API keys',
+				items: [
+					{ name: 'Where keys are stored', desc: TEXT.keysNote, searchable: false },
+					{
+						name: 'TMDB API key',
+						desc: TEXT.tmdb,
+						aliases: ['movies', 'TV'],
+						control: { type: 'secret', key: 'tmdbSecretId' },
+					},
+					{
+						name: 'Twitch client ID',
+						desc: TEXT.twitchId,
+						aliases: ['games', 'IGDB'],
+						control: { type: 'secret', key: 'igdbClientIdSecretId' },
+					},
+					{
+						name: 'Twitch client secret',
+						desc: TEXT.twitchSecret,
+						aliases: ['games', 'IGDB'],
+						control: { type: 'secret', key: 'igdbClientSecretSecretId' },
+					},
+					{
+						name: 'Google Books API key',
+						desc: TEXT.googleBooks,
+						aliases: ['books'],
+						control: { type: 'secret', key: 'googleBooksSecretId' },
+					},
+				],
+			},
+			{
+				type: 'group',
+				heading: 'Notes',
+				items: [
+					{
+						name: 'Notes folder',
+						desc: TEXT.notesFolder,
+						control: {
+							type: 'folder',
+							key: 'notesFolder',
+							placeholder: 'Default location',
+						},
+					},
+					{
+						name: 'Link text',
+						desc: TEXT.linkText,
+						control: { type: 'dropdown', key: 'linkText', options: LINK_TEXT_STYLES },
+					},
+					{
+						name: 'Poster width',
+						desc: TEXT.posterWidth,
+						aliases: ['cover', 'image size'],
+						control: {
+							type: 'number',
+							key: 'posterWidth',
+							placeholder: String(DEFAULT_SETTINGS.posterWidth),
+							defaultValue: DEFAULT_SETTINGS.posterWidth,
+							min: 1,
+							step: 1,
+							validate: (value) =>
+								isValidPosterWidth(value) ? undefined : 'Enter a whole number above zero.',
+						},
+					},
+				],
+			},
+		];
+	}
+
+	getControlValue(key: string): unknown {
+		return this.plugin.settings[key as keyof MediaNoteCreatorSettings];
+	}
+
+	async setControlValue(key: string, value: unknown): Promise<void> {
+		const settings = this.plugin.settings;
+		switch (key) {
+			case 'tmdbSecretId':
+			case 'igdbClientIdSecretId':
+			case 'igdbClientSecretSecretId':
+			case 'googleBooksSecretId':
+				settings[key] = typeof value === 'string' ? value : '';
+				break;
+			case 'notesFolder':
+				settings.notesFolder = typeof value === 'string' ? value.trim() : '';
+				break;
+			case 'linkText':
+				if (typeof value === 'string' && value in LINK_TEXT_STYLES) {
+					settings.linkText = value as LinkTextStyle;
+				}
+				break;
+			case 'posterWidth':
+				if (!isValidPosterWidth(value)) return;
+				settings.posterWidth = value;
+				break;
+			default:
+				return;
+		}
+		await this.plugin.saveSettings();
+	}
+
+	/** Imperative settings, for Obsidian versions before 1.13. */
 	display(): void {
 		const { containerEl } = this;
 		const settings = this.plugin.settings;
@@ -86,31 +217,17 @@ export class MediaNoteCreatorSettingTab extends PluginSettingTab {
 		new Setting(containerEl).setName('API keys').setHeading();
 		containerEl.createEl('p', {
 			cls: 'setting-item-description',
-			text: 'Keys are stored in the Obsidian Keychain, not in this plugin’s settings file. Albums and word lookups need no key.',
+			text: TEXT.keysNote,
 		});
-		this.secretSetting(
-			'TMDB API key',
-			'Movies and TV. Get one at themoviedb.org under Settings → API.',
-			'tmdbSecretId',
-		);
-		this.secretSetting(
-			'Twitch client ID',
-			'Games, from IGDB. Register an application at dev.twitch.tv to get a client ID and secret.',
-			'igdbClientIdSecretId',
-		);
-		this.secretSetting('Twitch client secret', 'Games, from IGDB.', 'igdbClientSecretSecretId');
-		this.secretSetting(
-			'Google Books API key',
-			'Books. Create a key in the Google Cloud console with the Books API turned on.',
-			'googleBooksSecretId',
-		);
+		this.secretSetting('TMDB API key', TEXT.tmdb, 'tmdbSecretId');
+		this.secretSetting('Twitch client ID', TEXT.twitchId, 'igdbClientIdSecretId');
+		this.secretSetting('Twitch client secret', TEXT.twitchSecret, 'igdbClientSecretSecretId');
+		this.secretSetting('Google Books API key', TEXT.googleBooks, 'googleBooksSecretId');
 
 		new Setting(containerEl).setName('Notes').setHeading();
 		new Setting(containerEl)
 			.setName('Notes folder')
-			.setDesc(
-				'Where new notes go. Leave empty to use the default location for new notes from Obsidian’s own settings.',
-			)
+			.setDesc(TEXT.notesFolder)
 			.addText((text) => {
 				new FolderSuggest(this.app, text.inputEl);
 				text
@@ -124,9 +241,7 @@ export class MediaNoteCreatorSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Link text')
-			.setDesc(
-				'When you add titles from selected text, each line becomes a link to its new note. Choose what the link shows.',
-			)
+			.setDesc(TEXT.linkText)
 			.addDropdown((dropdown) =>
 				dropdown
 					.addOptions(LINK_TEXT_STYLES)
@@ -139,14 +254,14 @@ export class MediaNoteCreatorSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Poster width')
-			.setDesc('Width in pixels. Height follows the image’s shape.')
+			.setDesc(TEXT.posterWidth)
 			.addText((text) =>
 				text
 					.setPlaceholder(String(DEFAULT_SETTINGS.posterWidth))
 					.setValue(String(settings.posterWidth))
 					.onChange(async (value) => {
 						const width = Number.parseInt(value, 10);
-						if (Number.isFinite(width) && width > 0) {
+						if (isValidPosterWidth(width)) {
 							settings.posterWidth = width;
 							await this.plugin.saveSettings();
 						}
