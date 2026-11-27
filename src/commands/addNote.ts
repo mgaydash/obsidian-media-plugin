@@ -82,7 +82,7 @@ async function runAdd(
 			client,
 			folder,
 			pick: (title, results) =>
-				new ResultSuggestModal(app, title, results).openAndWait(),
+				new ResultSuggestModal(app, title, results, client.resultAttribution).openAndWait(),
 			confirm: (message) => new ConfirmModal(app, message).openAndWait(),
 			fileExists: (path) => fileExists(app, path),
 			writeNote: (path, content) => writeNote(app, path, content),

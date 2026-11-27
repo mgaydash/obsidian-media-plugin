@@ -7,6 +7,7 @@ import {
 	SettingDefinitionItem,
 	TFolder,
 } from 'obsidian';
+import { TMDB_LOGO_URI } from './assets/tmdbLogo';
 import { LINK_TEXT_STYLES, LinkTextStyle } from './core/selection';
 import type MediaNoteCreatorPlugin from './main';
 
@@ -79,7 +80,42 @@ const TEXT = {
 	linkText:
 		'When you add titles from selected text, each line becomes a link to its new note. Choose what the link shows.',
 	posterWidth: 'Width in pixels. Height follows the image’s shape.',
+	creditsNote:
+		'Notes are made from these services. Each one’s own terms apply to how you use what it returns.',
 };
+
+/**
+ * Attribution the services' terms ask for: TMDB API terms section 3 (logo and
+ * this exact notice), Twitch Developer Agreement VII.C, the MusicBrainz data
+ * license (tags are CC BY-NC-SA), Google Books branding, and CC BY-SA for
+ * Wiktionary.
+ */
+export const CREDITS: { name: string; desc: string; logo?: string }[] = [
+	{
+		name: 'TMDB',
+		desc: 'This plugin uses TMDB and the TMDB APIs but is not endorsed, certified, or otherwise approved by TMDB.',
+		logo: TMDB_LOGO_URI,
+	},
+	{ name: 'IGDB', desc: 'Game data and covers from IGDB.com, through the Twitch API.' },
+	{
+		name: 'MusicBrainz',
+		desc: 'Album data from MusicBrainz. Its core data is CC0 and its tags are CC BY-NC-SA 3.0. Covers come from the Cover Art Archive.',
+	},
+	{ name: 'Google Books', desc: 'Book data and covers powered by Google.' },
+	{
+		name: 'Wiktionary',
+		desc: 'Word definitions from Wiktionary, under CC BY-SA, through the Free Dictionary API.',
+	},
+];
+
+/** Adds a credit's logo, if any, to its setting row. */
+function addCreditLogo(setting: Setting, credit: (typeof CREDITS)[number]): void {
+	if (!credit.logo) return;
+	setting.controlEl.createEl('img', {
+		cls: 'media-note-creator-credit-logo',
+		attr: { src: credit.logo, alt: credit.name },
+	});
+}
 
 /** A valid poster width: a whole number of pixels above zero. */
 export function isValidPosterWidth(value: unknown): value is number {
@@ -172,6 +208,22 @@ export class MediaNoteCreatorSettingTab extends PluginSettingTab {
 								isValidPosterWidth(value) ? undefined : 'Enter a whole number above zero.',
 						},
 					},
+				],
+			},
+			{
+				type: 'group',
+				heading: 'Credits',
+				items: [
+					{ name: 'About these sources', desc: TEXT.creditsNote, searchable: false },
+					...CREDITS.map((credit) => ({
+						name: credit.name,
+						desc: credit.desc,
+						aliases: ['credits', 'attribution'],
+						render: (setting: Setting) => {
+							setting.setName(credit.name).setDesc(credit.desc);
+							addCreditLogo(setting, credit);
+						},
+					})),
 				],
 			},
 		];
@@ -267,6 +319,15 @@ export class MediaNoteCreatorSettingTab extends PluginSettingTab {
 						}
 					}),
 			);
+
+		new Setting(containerEl).setName('Credits').setHeading();
+		containerEl.createEl('p', {
+			cls: 'setting-item-description',
+			text: TEXT.creditsNote,
+		});
+		for (const credit of CREDITS) {
+			addCreditLogo(new Setting(containerEl).setName(credit.name).setDesc(credit.desc), credit);
+		}
 	}
 
 	/** A setting that picks a Keychain entry and stores only its name. */

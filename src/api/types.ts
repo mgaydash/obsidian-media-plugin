@@ -55,4 +55,6 @@ export interface MediaClient<Details = unknown> {
 	/** Full note text. `poster` is the poster file name, when there is one. */
 	formatNote(details: Details, poster?: string): string;
 	getPosterUrl(details: Details): string | null;
+	/** Credit the source's terms require next to its search results, if any. */
+	readonly resultAttribution?: string;
 }

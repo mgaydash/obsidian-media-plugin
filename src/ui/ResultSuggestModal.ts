@@ -13,9 +13,13 @@ export class ResultSuggestModal extends SuggestModal<SearchResult> {
 		app: App,
 		title: string,
 		private readonly results: SearchResult[],
+		attribution?: string,
 	) {
 		super(app);
 		this.setPlaceholder(`Several matches for "${title}". Pick one, or press Esc to skip.`);
+		if (attribution) {
+			this.modalEl.createDiv({ cls: 'media-note-creator-attribution', text: attribution });
+		}
 	}
 
 	openAndWait(): Promise<SearchResult | null> {

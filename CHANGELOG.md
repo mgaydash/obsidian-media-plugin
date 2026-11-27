@@ -3,6 +3,16 @@
 Each release's notes are taken from its section here by the release workflow,
 so add a `## <version>` section before tagging.
 
+## 0.3.2
+
+- New **Credits** section in settings and the README, crediting TMDB (with its
+  logo and required notice), IGDB, MusicBrainz, Google Books and Wiktionary.
+- The book result list now shows "Powered by Google".
+- Word notes link to their license. Definitions from the Wiktionary fallback
+  are labeled CC BY-SA 4.0, the license Wiktionary uses now.
+- The README explains the data sources' terms, including the Google Books and
+  TMDB limits on keeping what they return.
+
 ## 0.3.1
 
 - Settings now appear in Obsidian's settings search (Obsidian 1.13 and later).

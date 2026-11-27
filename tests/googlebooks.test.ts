@@ -122,6 +122,10 @@ describe('GoogleBooksClient.getDetails', () => {
 
 describe('Google Books helpers and notes', () => {
 	const { client } = setup();
+
+	it('credits Google next to its search results, as its branding rules require', () => {
+		expect(client.resultAttribution).toBe('Powered by Google');
+	});
 	const bare: BookDetails = {
 		id: 'x',
 		title: 'Untitled: A Draft',
