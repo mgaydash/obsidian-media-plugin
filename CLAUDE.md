@@ -43,7 +43,9 @@ was never tagged). Next: community store submission.
 ```
 src/
 ├── main.ts                 # Plugin lifecycle only: settings, commands, getSecret()
-├── settings.ts             # Settings type, defaults, settings tab, folder suggest
+├── settings.ts             # Settings type, defaults, settings tab (incl. Credits), folder suggest
+├── assets/
+│   └── tmdbLogo.ts         # TMDB logo SVG, inlined as a data URI for Credits
 ├── api/
 │   ├── types.ts            # MediaClient, SearchResult, HttpGetJson/HttpRequestJson, HttpError, Sleep
 │   ├── tmdb.ts             # TMDB (movies + TV)
@@ -103,7 +105,10 @@ tests/                      # Vitest; fixtures copied from the CLI repo
   15 s, English section only, HTML stripped, one entry, no pronunciation or
   synonyms). A 404 means the word is not in Wiktionary, so it never falls
   back. Entries are cached by `word#index` in `search()` for `getDetails()`.
-  Homographs are separate results, so they always prompt. Part of speech is
+  Homographs are separate results, so they always prompt. The Source section
+  links the license (`[CC BY-SA 3.0](url)`): the primary's own license
+  name and URL, or CC BY-SA 4.0 for Wiktionary fallback entries. This is the
+  one place lookup notes differ from the CLI. Part of speech is
   the tag (not run through the genre table). Filename `Word.md`, no poster,
   and `addTitle()` skips the "no poster" warning for lookups.
   `HttpRequest.timeoutMs` is implemented in `obsidian/http.ts` by racing
@@ -145,6 +150,16 @@ tests/                      # Vitest; fixtures copied from the CLI repo
   resolves anywhere in the vault (`getFirstLinkpathDest`) or its path exists.
   Pages have no frontmatter; vault-specific bits (`collection: [[Index]]`,
   `cssclasses`, rating/status columns) are the user's to add.
+- **Data-source terms** (reviewed 2026-11): attribution lives in `CREDITS`
+  in `settings.ts`, shown in a Credits group in both settings renderers and
+  mirrored in the README. TMDB requires its logo (`assets/tmdbLogo.ts`, an
+  unmodified official SVG) and an exact notice; Google Books requires
+  "Powered by Google" beside results, which clients supply through
+  `MediaClient.resultAttribution` and `ResultSuggestModal` shows. Google's
+  API terms forbid permanent copies and TMDB's cap caching at 6 months; book
+  and movie/TV notes still keep descriptions and covers, by Mitchell's choice,
+  and the README's terms section says so. Check terms before adding a source
+  or changing what notes store.
 - **`SuggestModal` calls `onClose` before `onChooseSuggestion`**, so
   `ResultSuggestModal` resolves on the next tick. Keep that pattern in new
   pick lists.

@@ -78,6 +78,8 @@ function smallestCoverUrl(links: Record<string, string | undefined> | undefined)
 
 export class GoogleBooksClient implements MediaClient<BookDetails> {
 	readonly mediaType = 'book' as const;
+	/** Google Books branding guidelines: shown alongside any search results. */
+	readonly resultAttribution = 'Powered by Google';
 	/** Stand-in volume id -> earliest year across its editions, filled by search(). */
 	private readonly earliestYears = new Map<string, number | null>();
 

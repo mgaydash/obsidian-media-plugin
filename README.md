@@ -17,8 +17,8 @@ and writes the same notes it does.
 | **Add word lookup** | [Free Dictionary API](https://dictionaryapi.dev/), falling back to [Wiktionary](https://en.wiktionary.org/) | `Word.md` | `[[Lookups]]` |
 
 A word lookup writes the pronunciation, definitions with examples, synonyms
-and antonyms (as links), and a source line crediting Wiktionary, whose text is
-CC BY-SA. Words with several origins, such as "bass" the fish and "bass" the
+and antonyms (as links), and a Source section crediting Wiktionary, whose
+text is CC BY-SA, with a link to the license. Words with several origins, such as "bass" the fish and "bass" the
 sound, appear as separate choices. Lookups have no cover and use the part of
 speech as the tag. If the Free Dictionary API is down, the plugin switches to
 Wiktionary for the rest of the batch; those notes have definitions but no
@@ -129,6 +129,44 @@ key (TMDB, Twitch and Google Cloud). Albums and word lookups need no account.
 
 MusicBrainz and dictionary requests carry a User-Agent naming this plugin.
 MusicBrainz requests are spaced at least one second apart, as it asks.
+
+## Terms of the data sources
+
+Each service has its own terms, and for movies, TV, games and books you accept
+them yourself when you create your key. Two of them limit keeping what they
+return, which this plugin does by writing it into notes:
+
+- **Google Books.** The [Google APIs Terms of Service](https://developers.google.com/terms)
+  (section 5) do not allow permanent copies of content returned by the API.
+  Book notes keep the book's description and cover.
+- **TMDB.** The [TMDB API Terms of Use](https://www.themoviedb.org/api-terms-of-use)
+  (section 1.C) do not allow caching TMDB information for longer than six
+  months. Movie and TV notes keep the overview, cast and poster.
+
+The plugin is meant for personal notes in your own vault. Use it for books,
+movies and TV only if you are comfortable with those terms.
+
+Album tags from MusicBrainz are under CC BY-NC-SA 3.0, so they are for
+non-commercial use. Wiktionary definitions are under CC BY-SA, and each word
+note keeps the source link and license it needs.
+
+If you hold rights to something the plugin fetched and want it handled
+differently, [open an issue](https://github.com/mgaydash/obsidian-media-plugin/issues).
+
+## Credits
+
+The settings tab has the same credits, with the TMDB logo.
+
+- **TMDB:** This plugin uses TMDB and the TMDB APIs but is not endorsed,
+  certified, or otherwise approved by TMDB.
+- **IGDB:** game data and covers from [IGDB.com](https://www.igdb.com/),
+  through the Twitch API.
+- **MusicBrainz:** album data from [MusicBrainz](https://musicbrainz.org/)
+  (core data CC0, tags CC BY-NC-SA 3.0), covers from the
+  [Cover Art Archive](https://coverartarchive.org/).
+- **Google Books:** book data and covers powered by Google.
+- **Wiktionary:** word definitions from [Wiktionary](https://en.wiktionary.org/)
+  under CC BY-SA, through the [Free Dictionary API](https://dictionaryapi.dev/).
 
 ## Development
 

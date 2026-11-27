@@ -16,7 +16,9 @@ import { HttpError, HttpRequestJson, MediaClient, SearchResult } from './types';
 
 const PRIMARY_URL = 'https://api.dictionaryapi.dev/api/v2/entries/en';
 const FALLBACK_URL = 'https://en.wiktionary.org/api/rest_v1/page/definition';
-const WIKTIONARY_LICENSE = 'CC BY-SA 3.0';
+/** Wiktionary's text license since 2023 (Wikimedia Terms of Use, section 7). */
+const WIKTIONARY_LICENSE = 'CC BY-SA 4.0';
+const WIKTIONARY_LICENSE_URL = 'https://creativecommons.org/licenses/by-sa/4.0/';
 /** The primary's usual failure is a hang, so it gets the shorter wait. */
 export const PRIMARY_TIMEOUT_MS = 8000;
 export const FALLBACK_TIMEOUT_MS = 15000;
@@ -42,6 +44,8 @@ export interface WordEntry {
 	antonyms: string[];
 	sourceUrls: string[];
 	license: string;
+	/** Link to the license text, which CC BY-SA asks each copy to include. */
+	licenseUrl: string | null;
 	source: 'dictionaryapi.dev' | 'wiktionary';
 }
 
@@ -62,7 +66,7 @@ interface PrimaryEntry {
 		synonyms?: unknown;
 		antonyms?: unknown;
 	}[];
-	license?: { name?: string };
+	license?: { name?: string; url?: string };
 	sourceUrls?: string[];
 }
 
@@ -123,7 +127,10 @@ export function normalizePrimary(word: string, index: number, entry: PrimaryEntr
 		synonyms,
 		antonyms,
 		sourceUrls: entry.sourceUrls ?? [],
-		license: entry.license?.name ?? WIKTIONARY_LICENSE,
+		// The primary reports the license of the Wiktionary revision it copied.
+		...(entry.license?.name
+			? { license: entry.license.name, licenseUrl: entry.license.url || null }
+			: { license: WIKTIONARY_LICENSE, licenseUrl: WIKTIONARY_LICENSE_URL }),
 		source: 'dictionaryapi.dev',
 	};
 }
@@ -151,6 +158,7 @@ export function normalizeFallback(word: string, sections: FallbackSection[]): Wo
 		antonyms: [],
 		sourceUrls: [`https://en.wiktionary.org/wiki/${encodeURIComponent(word)}`],
 		license: WIKTIONARY_LICENSE,
+		licenseUrl: WIKTIONARY_LICENSE_URL,
 		source: 'wiktionary',
 	};
 }
@@ -292,8 +300,10 @@ export class DictionaryClient implements MediaClient<WordEntry> {
 		if (entry.antonyms.length > 0) {
 			sections.push(`## Antonyms\n${entry.antonyms.map(wikilink).join(', ')}`);
 		}
-		// CC BY-SA requires attribution, and these notes keep the text.
-		sections.push(`## Source\n${[...entry.sourceUrls, entry.license].join('\n')}`);
+		// CC BY-SA requires attribution and a link to the license, and these
+		// notes keep the text.
+		const license = entry.licenseUrl ? `[${entry.license}](${entry.licenseUrl})` : entry.license;
+		sections.push(`## Source\n${[...entry.sourceUrls, license].join('\n')}`);
 
 		return `${buildFrontmatter(COLLECTION_BY_MEDIA_TYPE.lookup, tags)}\n\n${sections.join('\n\n')}\n`;
 	}
